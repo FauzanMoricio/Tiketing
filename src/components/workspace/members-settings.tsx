@@ -183,7 +183,14 @@ export function WorkspaceMembersSettings({
                         onValueChange={(val) => val && handleRoleChange(member.id, val)}
                       >
                         <SelectTrigger className="w-[120px] h-8 text-xs">
-                          <SelectValue />
+                          <SelectValue>
+                            {(val) => {
+                              if (val === "admin") return "Admin";
+                              if (val === "member") return "Member";
+                              if (val === "viewer") return "Viewer";
+                              return val;
+                            }}
+                          </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="admin">Admin</SelectItem>
@@ -250,7 +257,14 @@ export function WorkspaceMembersSettings({
               <Label htmlFor="role">Workspace Role</Label>
               <Select value={inviteRole} onValueChange={(val) => val && setInviteRole(val)} disabled={isInviting}>
                 <SelectTrigger id="role" className="w-full">
-                  <SelectValue />
+                  <SelectValue>
+                    {(val) => {
+                      if (val === "admin") return "Admin (Manage Spaces & Settings)";
+                      if (val === "member") return "Member (Create & Edit Tickets)";
+                      if (val === "viewer") return "Viewer (Read-Only)";
+                      return val;
+                    }}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="admin">Admin (Manage Spaces & Settings)</SelectItem>

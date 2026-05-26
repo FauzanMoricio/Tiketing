@@ -6,6 +6,8 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import fs from "fs";
+import path from "path";
 
 import { auth } from "@/auth";
 import { generateTicketIdAndCreateTicket } from "@/lib/ticket-generation";
@@ -270,16 +272,34 @@ export async function createAttachment(
     url: string;
     size: number;
     type: string;
+    base64Data?: string;
   }
 ) {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
 
+  let finalUrl = data.url;
+
+  if (data.base64Data) {
+    const uploadDir = path.join(process.cwd(), "public", "uploads");
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    const filePrefix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    const cleanName = data.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+    const uniqueFileName = `${filePrefix}-${cleanName}`;
+    const fsPath = path.join(uploadDir, uniqueFileName);
+
+    const base64Content = data.base64Data.split(";base64,").pop() || data.base64Data;
+    fs.writeFileSync(fsPath, Buffer.from(base64Content, "base64"));
+    finalUrl = `/uploads/${uniqueFileName}`;
+  }
+
   const attachment = await prisma.attachment.create({
     data: {
       ticketId,
       name: data.name,
-      url: data.url,
+      url: finalUrl,
       size: data.size,
       type: data.type,
     },
@@ -305,6 +325,18 @@ export async function deleteAttachment(attachmentId: string) {
 
   const attachment = await prisma.attachment.findUnique({ where: { id: attachmentId } });
   if (!attachment) return;
+
+  if (attachment.url.startsWith("/uploads/")) {
+    const fileName = attachment.url.replace("/uploads/", "");
+    const fsPath = path.join(process.cwd(), "public", "uploads", fileName);
+    try {
+      if (fs.existsSync(fsPath)) {
+        fs.unlinkSync(fsPath);
+      }
+    } catch (err) {
+      console.error("Failed to delete physical file:", err);
+    }
+  }
 
   await prisma.attachment.delete({
     where: { id: attachmentId },

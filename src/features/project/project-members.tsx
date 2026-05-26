@@ -129,7 +129,14 @@ export function ProjectMembers({ members, workspaceId, currentUserRole }: Projec
               <Label htmlFor="role">Workspace Role</Label>
               <Select value={inviteRole} onValueChange={(val) => val && setInviteRole(val)} disabled={isInviting}>
                 <SelectTrigger id="role" className="w-full">
-                  <SelectValue />
+                  <SelectValue>
+                    {(val) => {
+                      if (val === "admin") return "Admin (Manage Spaces & Settings)";
+                      if (val === "member") return "Member (Create & Edit Tickets)";
+                      if (val === "viewer") return "Viewer (Read-Only)";
+                      return val;
+                    }}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="admin">Admin (Manage Spaces & Settings)</SelectItem>

@@ -403,15 +403,21 @@ export function TicketDetailContent({
     try {
       setIsUploading(true);
       
-      // Simulate real attachment storage in DB
-      // We will create a local attachment with a mock url (representing a beautiful dynamic attachment)
+      const base64Data = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = (err) => reject(err);
+        reader.readAsDataURL(file);
+      });
+
       const mockUrl = `/uploads/${Date.now()}-${file.name}`;
       
       const newAttachment = await createAttachment(ticket.id, {
         name: file.name,
         url: mockUrl,
         size: file.size,
-        type: file.type
+        type: file.type,
+        base64Data,
       });
 
       setTicket(prev => ({

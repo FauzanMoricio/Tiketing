@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createTicket, getProjectTickets, addTicketRelation } from "@/actions/ticket.actions";
-import { PRIORITIES, PRIORITY_CONFIG } from "@/lib/constants";
+import { PRIORITIES, PRIORITY_CONFIG, type Priority } from "@/lib/constants";
 import { useKanbanStore } from "@/store/kanban-store";
 import { Loader2, Calendar as CalendarIcon } from "lucide-react";
 import type { TicketData } from "@/types";
@@ -186,7 +186,23 @@ export function CreateTicketModal({
                 <Label>Priority</Label>
                 <Select value={priority} onValueChange={(val) => val && setPriority(val)}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue>
+                      {(val) => {
+                        const p = val as Priority;
+                        if (!p || !PRIORITY_CONFIG[p]) return "";
+                        return (
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="h-2 w-2 rounded-full"
+                              style={{
+                                backgroundColor: PRIORITY_CONFIG[p].color,
+                              }}
+                            />
+                            {PRIORITY_CONFIG[p].label}
+                          </div>
+                        );
+                      }}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {PRIORITIES.map((p) => (
@@ -209,7 +225,13 @@ export function CreateTicketModal({
                 <Label htmlFor="ticket-assignee">Assignee</Label>
                 <Select value={assignee || "unassigned"} onValueChange={(val) => setAssignee(val === "unassigned" || !val ? "" : val)}>
                   <SelectTrigger id="ticket-assignee" className="w-full">
-                    <SelectValue placeholder="Unassigned" />
+                    <SelectValue placeholder="Unassigned">
+                      {(val) => {
+                        if (!val || val === "unassigned") return "Unassigned";
+                        const member = members?.find((m) => m.user.id === val);
+                        return member?.user.name || "Unknown";
+                      }}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="unassigned">Unassigned</SelectItem>
@@ -271,7 +293,13 @@ export function CreateTicketModal({
                   <Label htmlFor="ticket-relation">Related Ticket</Label>
                   <Select value={relatedTicketId || "unselected"} onValueChange={(val) => setRelatedTicketId(val === "unselected" || !val ? "" : val)}>
                     <SelectTrigger id="ticket-relation" className="w-full">
-                      <SelectValue placeholder="Select ticket to relate" />
+                      <SelectValue placeholder="Select ticket to relate">
+                        {(val) => {
+                          if (!val || val === "unselected") return "None";
+                          const t = projectTickets.find((item) => item.id === val);
+                          return t ? `${t.ticketId} - ${t.title}` : "None";
+                        }}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="unselected">None</SelectItem>

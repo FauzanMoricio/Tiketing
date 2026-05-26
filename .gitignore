@@ -7,3 +7,4 @@ node_modules
 dist/
 build/
 *_backup_before_refactor/
+public/uploads/

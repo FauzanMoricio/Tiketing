@@ -330,7 +330,13 @@ export function AdminDashboardClient({
                                 onValueChange={(val) => handleRoleChange(user.id as string, val as string)}
                               >
                                 <SelectTrigger className="w-[120px] h-8 text-[11px] rounded-lg">
-                                  <SelectValue />
+                                  <SelectValue>
+                                    {(val) => {
+                                      if (val === "admin") return "Admin";
+                                      if (val === "user") return "User";
+                                      return val;
+                                    }}
+                                  </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="admin">Admin</SelectItem>
@@ -442,7 +448,13 @@ export function AdminDashboardClient({
               <Label htmlFor="create-role" className="text-xs font-semibold">System Role</Label>
               <Select value={role} onValueChange={(val) => val && setRole(val)} disabled={isCreating}>
                 <SelectTrigger id="create-role" className="w-full h-10 text-xs rounded-xl">
-                  <SelectValue />
+                  <SelectValue>
+                    {(val) => {
+                      if (val === "user") return "User (Create Workspace, Projects & Tickets)";
+                      if (val === "admin") return "Admin (Manage Platform Settings & Users)";
+                      return val;
+                    }}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="user">User (Create Workspace, Projects & Tickets)</SelectItem>
