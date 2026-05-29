@@ -76,6 +76,7 @@ export default async function DiscussionPage({ params }: PageProps) {
           projectId={projectId}
           initialDiscussions={discussions as any}
           currentUser={currentUser}
+          isViewer={currentUserRole === "viewer"}
         />
       </div>
     </AppShell>

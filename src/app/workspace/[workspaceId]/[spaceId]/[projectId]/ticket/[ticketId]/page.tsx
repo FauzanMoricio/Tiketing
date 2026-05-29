@@ -17,10 +17,15 @@ export default async function TicketDetailPage(props: {
   const session = await auth();
   if (!session?.user?.id) return notFound();
 
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(params.ticketId);
+
   const [ticket, workspace, projectStatuses, workspaceMembers, projectTickets] = await Promise.all([
     prisma.ticket.findFirst({
       where: { 
-        ticketId: params.ticketId,
+        OR: [
+          { ticketId: { equals: params.ticketId, mode: "insensitive" } },
+          ...(isUuid ? [{ id: params.ticketId }] : [])
+        ],
         project: {
           id: params.projectId,
           space: {

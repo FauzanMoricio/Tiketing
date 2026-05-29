@@ -67,6 +67,7 @@ interface DiscussionBoardViewProps {
     name?: string | null;
     image?: string | null;
   };
+  isViewer: boolean;
 }
 
 const CATEGORIES = ["All", "Planning", "Brainstorming", "Meeting Notes", "General"];
@@ -74,7 +75,8 @@ const CATEGORIES = ["All", "Planning", "Brainstorming", "Meeting Notes", "Genera
 export function DiscussionBoardView({ 
   projectId, 
   initialDiscussions, 
-  currentUser 
+  currentUser,
+  isViewer
 }: DiscussionBoardViewProps) {
   const [discussions, setDiscussions] = useState<Discussion[]>(initialDiscussions);
   const [activeCategory, setActiveCategory] = useState("All");
@@ -348,10 +350,12 @@ export function DiscussionBoardView({
               <MessageSquare className="h-3.5 w-3.5 text-primary shrink-0" />
               <span>Channels</span>
             </h2>
-            <Button size="sm" onClick={() => setIsCreateOpen(true)} className="h-7 rounded-lg gap-1 shadow-sm text-xs font-semibold px-2.5">
-              <Plus className="h-3 w-3" />
-              New Topic
-            </Button>
+            {!isViewer && (
+              <Button size="sm" onClick={() => setIsCreateOpen(true)} className="h-7 rounded-lg gap-1 shadow-sm text-xs font-semibold px-2.5">
+                <Plus className="h-3 w-3" />
+                New Topic
+              </Button>
+            )}
           </div>
 
           {/* Search container */}
@@ -470,15 +474,17 @@ export function DiscussionBoardView({
 
               {/* Pin / Delete Controls */}
               <div className="flex items-center gap-0.5">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className={`h-7 w-7 rounded-lg ${selectedThread.isPinned ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" : "text-muted-foreground hover:bg-muted"}`}
-                  onClick={() => handleTogglePin(selectedThread.id, selectedThread.isPinned)}
-                >
-                  <Pin className={`h-3 w-3 ${selectedThread.isPinned ? "fill-amber-500" : ""}`} />
-                </Button>
-                {(currentUser.id === selectedThread.author.id) && (
+                {!isViewer && (
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className={`h-7 w-7 rounded-lg ${selectedThread.isPinned ? "text-amber-500 bg-amber-500/10 hover:bg-amber-500/20" : "text-muted-foreground hover:bg-muted"}`}
+                    onClick={() => handleTogglePin(selectedThread.id, selectedThread.isPinned)}
+                  >
+                    <Pin className={`h-3 w-3 ${selectedThread.isPinned ? "fill-amber-500" : ""}`} />
+                  </Button>
+                )}
+                {!isViewer && (currentUser.id === selectedThread.author.id) && (
                   <Button 
                     variant="ghost" 
                     size="icon" 

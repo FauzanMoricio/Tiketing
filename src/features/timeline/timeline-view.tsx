@@ -42,9 +42,10 @@ interface TimelineTask {
 interface TimelineViewProps {
   initialTickets: any[];
   members: Member[];
+  isViewer: boolean;
 }
 
-export function TimelineView({ initialTickets, members }: TimelineViewProps) {
+export function TimelineView({ initialTickets, members, isViewer }: TimelineViewProps) {
   
   // State variables
   const [zoom, setZoom] = useState<"week" | "month" | "year">("month");
@@ -252,6 +253,7 @@ export function TimelineView({ initialTickets, members }: TimelineViewProps) {
   ) => {
     e.preventDefault();
     e.stopPropagation();
+    if (isViewer) return;
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
 
@@ -645,31 +647,33 @@ export function TimelineView({ initialTickets, members }: TimelineViewProps) {
                   <div 
                     className={`h-9 rounded-xl flex items-center justify-between px-3 text-[10px] font-bold text-white shadow-md relative group/bar transition-all hover:scale-[1.01] hover:shadow-lg ${
                       isCP 
-                        ? "bg-gradient-to-r from-red-600 to-rose-500 ring-2 ring-red-400 ring-offset-2 ring-offset-background cursor-move"
+                        ? `bg-gradient-to-r from-red-600 to-rose-500 ring-2 ring-red-400 ring-offset-2 ring-offset-background ${isViewer ? "cursor-default" : "cursor-move"}`
                         : task.statusName.toLowerCase() === "done"
-                        ? "bg-gradient-to-r from-emerald-500 to-green-500 cursor-move"
+                        ? `bg-gradient-to-r from-emerald-500 to-green-500 ${isViewer ? "cursor-default" : "cursor-move"}`
                         : task.statusName.toLowerCase() === "in progress"
-                        ? "bg-gradient-to-r from-blue-600 to-indigo-500 cursor-move"
-                        : "bg-gradient-to-r from-slate-600 to-slate-500 cursor-move"
+                        ? `bg-gradient-to-r from-blue-600 to-indigo-500 ${isViewer ? "cursor-default" : "cursor-move"}`
+                        : `bg-gradient-to-r from-slate-600 to-slate-500 ${isViewer ? "cursor-default" : "cursor-move"}`
                     }`}
                     style={{
                       gridColumnStart: gridStart,
                       gridColumnEnd: gridEnd,
                     }}
-                    onMouseDown={(e) => handleDragStart(e, task.id, "move")}
+                    onMouseDown={isViewer ? undefined : (e) => handleDragStart(e, task.id, "move")}
                   >
                     {/* Left drag resize handle */}
-                    <div 
-                      className="absolute left-0 top-0 bottom-0 w-2 hover:bg-white/20 cursor-w-resize rounded-l-xl transition-colors"
-                      onMouseDown={(e) => handleDragStart(e, task.id, "resize-left")}
-                    />
-
+                    {!isViewer && (
+                      <div 
+                        className="absolute left-0 top-0 bottom-0 w-2 hover:bg-white/20 cursor-w-resize rounded-l-xl transition-colors"
+                        onMouseDown={(e) => handleDragStart(e, task.id, "resize-left")}
+                      />
+                    )}
+ 
                     {/* Content inside bar */}
                     <div className="flex items-center gap-1.5 min-w-0 flex-1 px-1 select-none">
                       <span className="truncate">{task.title}</span>
                       <span className="text-[8px] font-normal opacity-70 shrink-0">({task.duration}d)</span>
                     </div>
-
+ 
                     {/* Assignee Avatar / Initial */}
                     <div 
                       className="h-5 w-5 rounded-full bg-white/20 text-white border border-white/30 flex items-center justify-center font-bold text-[8px] shrink-0"
@@ -677,12 +681,14 @@ export function TimelineView({ initialTickets, members }: TimelineViewProps) {
                     >
                       {task.assigneeName.charAt(0).toUpperCase()}
                     </div>
-
+ 
                     {/* Right drag resize handle */}
-                    <div 
-                      className="absolute right-0 top-0 bottom-0 w-2 hover:bg-white/20 cursor-e-resize rounded-r-xl transition-colors"
-                      onMouseDown={(e) => handleDragStart(e, task.id, "resize-right")}
-                    />
+                    {!isViewer && (
+                      <div 
+                        className="absolute right-0 top-0 bottom-0 w-2 hover:bg-white/20 cursor-e-resize rounded-r-xl transition-colors"
+                        onMouseDown={(e) => handleDragStart(e, task.id, "resize-right")}
+                      />
+                    )}
                   </div>
                 </div>
               );

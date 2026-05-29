@@ -97,6 +97,9 @@ export default async function ReportsPage({ params }: PageProps) {
           activities={dbActivities as any}
           workspaceMembers={project.space.workspace.members as any}
           isViewer={currentUserRole === "viewer"}
+          workspaceId={workspaceId}
+          spaceId={spaceId}
+          projectId={projectId}
         />
       </div>
     </AppShell>

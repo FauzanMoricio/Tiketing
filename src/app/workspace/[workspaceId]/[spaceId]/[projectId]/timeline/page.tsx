@@ -75,6 +75,7 @@ export default async function TimelinePage({ params }: PageProps) {
         <TimelineView 
           initialTickets={allTickets}
           members={project.space.workspace.members as any}
+          isViewer={currentUserRole === "viewer"}
         />
       </div>
     </AppShell>

@@ -118,7 +118,7 @@ async function getDashboardData(workspaceId?: string) {
       take: 8,
       include: {
         status: { select: { name: true, color: true } },
-        project: { select: { name: true } },
+        project: { select: { name: true, id: true, spaceId: true } },
       },
     }),
   ]);
@@ -235,9 +235,10 @@ export default async function DashboardPage({
             <CardContent className="p-0">
               <div className="divide-y divide-border">
                 {recentTickets.map((ticket) => (
-                  <div
+                  <Link
                     key={ticket.id}
-                    className="flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors"
+                    href={workspace ? `/workspace/${workspace.id}/${ticket.project.spaceId}/${ticket.project.id}/ticket/${ticket.ticketId}` : "#"}
+                    className="flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors cursor-pointer"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <div
@@ -258,7 +259,7 @@ export default async function DashboardPage({
                     <PriorityBadge
                       priority={ticket.priority as Priority}
                     />
-                  </div>
+                  </Link>
                 ))}
                 {recentTickets.length === 0 && (
                   <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">

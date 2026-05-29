@@ -15,6 +15,7 @@ import {
   ArrowRight,
   FileText
 } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 interface Status {
@@ -62,6 +63,9 @@ interface ReportsDashboardProps {
   activities: TicketActivity[];
   workspaceMembers: { user: User }[];
   isViewer: boolean;
+  workspaceId: string;
+  spaceId: string;
+  projectId: string;
 }
 
 export function ReportsDashboard({
@@ -69,6 +73,9 @@ export function ReportsDashboard({
   activities,
   workspaceMembers,
   isViewer,
+  workspaceId,
+  spaceId,
+  projectId,
 }: ReportsDashboardProps) {
   const [activeTab, setActiveTab] = useState<"dashboard" | "completed" | "overdue" | "workload">("dashboard");
   const [now] = useState(() => Date.now());
@@ -206,9 +213,12 @@ export function ReportsDashboard({
   const renderActivityDescription = (act: TicketActivity) => {
     const userName = <span className="font-bold text-foreground">{act.user.name || "A user"}</span>;
     const ticketLink = (
-      <span className="font-bold text-primary hover:underline cursor-pointer">
+      <Link 
+        href={`/workspace/${workspaceId}/${spaceId}/${projectId}/ticket/${act.ticket.ticketId}`}
+        className="font-bold text-primary hover:underline cursor-pointer"
+      >
         {act.ticket.ticketId}: {act.ticket.title}
-      </span>
+      </Link>
     );
 
     if (act.type === "status_change") {
@@ -587,7 +597,11 @@ export function ReportsDashboard({
           ) : (
             <div className="divide-y divide-border/30 border border-border/40 rounded-xl overflow-hidden">
               {completedTickets.map(ticket => (
-                <div key={ticket.id} className="p-3.5 flex items-center justify-between gap-4 hover:bg-muted/5 transition-colors">
+                <Link
+                  key={ticket.id}
+                  href={`/workspace/${workspaceId}/${spaceId}/${projectId}/ticket/${ticket.ticketId}`}
+                  className="p-3.5 flex items-center justify-between gap-4 hover:bg-muted/5 transition-colors cursor-pointer"
+                >
                   <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-extrabold bg-green-500/10 text-green-500 px-2.5 py-0.5 rounded-full uppercase">
@@ -606,7 +620,7 @@ export function ReportsDashboard({
                     <span className="block font-semibold text-green-500">Completed</span>
                     <span className="block mt-0.5 text-[9px] font-medium">{formatDate(ticket.updatedAt)}</span>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}
@@ -629,7 +643,11 @@ export function ReportsDashboard({
           ) : (
             <div className="divide-y divide-border/30 border border-border/40 rounded-xl overflow-hidden">
               {overdueTickets.map(ticket => (
-                <div key={ticket.id} className="p-3.5 flex items-center justify-between gap-4 hover:bg-muted/5 transition-colors">
+                <Link
+                  key={ticket.id}
+                  href={`/workspace/${workspaceId}/${spaceId}/${projectId}/ticket/${ticket.ticketId}`}
+                  className="p-3.5 flex items-center justify-between gap-4 hover:bg-muted/5 transition-colors cursor-pointer"
+                >
                   <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-extrabold bg-rose-500/10 text-rose-500 px-2.5 py-0.5 rounded-full uppercase">
@@ -650,7 +668,7 @@ export function ReportsDashboard({
                       Due: {ticket.dueDate ? formatDate(ticket.dueDate) : ""}
                     </span>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}

@@ -108,7 +108,7 @@ export function ActivityStream({
     const userName = <span className="font-extrabold text-foreground">{act.user.name}</span>;
     const ticketRef = act.ticket ? (
       <a 
-        href={`/workspace/${workspaceId}/${spaceId}/${projectId}/ticket/${act.ticket.id}`}
+        href={`/workspace/${workspaceId}/${spaceId}/${projectId}/ticket/${act.ticket.ticketId}`}
         className="font-bold text-primary hover:underline cursor-pointer"
       >
         {act.ticket.ticketId}
